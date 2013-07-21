@@ -43,6 +43,9 @@
 	// defintion of Extension
 	function CollectionView(view) {
 		this.cv_views = [];
+		if (view.collection) {
+			return;
+		}
 		// initialize collection if given
 		if (view.view && view.view.collection) {
 			this.collection = new view.view.collection();
