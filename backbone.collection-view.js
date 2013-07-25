@@ -1,30 +1,18 @@
 /*
-  dependency
-  ==========
-  backbone.beamer
-  
-  usage:
+	usage:
 	======
 	var layout = Backbone.View.extend({
 		view: {
 			type: MyNiceItemView,
-			events: {
-        'MyNiceItemView-custom-event': 'handleEvent'
-      }
+			target: '.a-selector-under-this-el'
 		},
 		
 		initialize: function() {
 			
-		},
-    
-    handleEvent: function(){
-    
-    }
+		}
 	});
-
-  // later on an instance of MyNiceItemView-custom-event may raise an event:
-  MyNiceItemViewInstance.trigger( 'MyNiceItemView-custom-event', { data: someData } );
-  
+	
+	@version 0.2
 */
 (function(){
 
@@ -53,6 +41,7 @@
 			this.collection = new Backbone.Collection();
 		}
 
+		this.$target = view.view.target ? view.$(view.view.target) : this.$el;
 		// bind to events of views if given
 		
 		// view.listenTo(this.collection, 'reset update', this.render);
@@ -62,8 +51,8 @@
 		render: function() {
 			// this.trigger('before:render');
 			this.resetViews();
-			this.collection.each(this.renderItem, this);
-			// this.trigger('after:render');
+			this.$target.append( this.collection.map(this.renderItem, this) );
+			this.trigger('view-after:render');
 		},
 
 		renderItem: function(model) {
@@ -75,12 +64,20 @@
 					this.listenTo(this.cv_views[index], _event, this[method]);
 				}, this);
 			}
-			this.$el.append( this.cv_views[index].render().el );
+			return this.cv_views[index].render().el;
 		},
 
 		resetViews: function() {
 			_.invoke(this.cv_views, 'remove');
 			this.cv_views.length = 0;
+		},
+
+		_hide: function() {
+			this.$el.removeClass(this.transition.css);
+		},
+
+		_show: function () {
+			this.$el.addClass(this.transition.css);
 		}
 	};
 
@@ -89,7 +86,13 @@
 			key: 'view',
 			extension: CollectionView,
 			initialize: function () {
-				this.listenTo(this.collection, 'reset destroy add remove sort', function(){
+				this.listenTo(this.collection, 'add', function(model){
+					this.$target.append(this.renderItem(model));
+				});
+				this.listenTo(this.collection, 'remove', function(model){
+					this.render();
+				});
+				this.listenTo(this.collection, 'reset change destroy sort', function(){
 					this.render();
 				});
 			}
