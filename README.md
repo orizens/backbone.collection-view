@@ -42,7 +42,12 @@ var MusicStore = Backbone.View.extend({
 			// the config follows Backbone.View events configuration
 			events: {
 				'MusicTrackView-custom-event': 'onMediaPlayed'
-			}
+			},
+			
+			// an optional target to set for the views to be rendered to
+			// useful if the target is not this.$el but rather
+			// located insided - this.$el.find(selector)
+			target: ".some-other-selector-in-this-view"
 
 		},
 
