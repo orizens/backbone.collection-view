@@ -31,6 +31,9 @@
 	// defintion of Extension
 	function CollectionView(view) {
 		this.cv_views = [];
+		
+		this.$target = view.view.target ? view.$(view.view.target) : this.$el;
+		
 		if (view.collection) {
 			return;
 		}
@@ -41,7 +44,6 @@
 			this.collection = new Backbone.Collection();
 		}
 
-		this.$target = view.view.target ? view.$(view.view.target) : this.$el;
 		// bind to events of views if given
 		
 		// view.listenTo(this.collection, 'reset update', this.render);
